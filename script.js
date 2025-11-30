@@ -5,52 +5,56 @@ const clearBtn = document.querySelector(".clear");
 const currentDisplay = document.querySelector(".current-display");
 const previousDisplay = document.querySelector(".previous-display");
 
-let previousNum;
-let currentNum;
+let num1;
+let num2;
 let operator;
 
 numBtns.forEach(button => {
     button.addEventListener("click", () => {
-        display(button.textContent);
-        if(previousNum === undefined && currentNum === undefined) {
-            previousNum = Number(button.textContent);
+        if(num1 === undefined && num2 === undefined) {
+            num1 = Number(button.textContent);
+            displayCurrent(num1);
         }
-        else if (previousNum !== undefined && currentNum === undefined) {
-            currentNum = Number(button.textContent);
+        else if (num1 !== undefined && num2 === undefined) {
+            num2 = Number(button.textContent);
+            displayCurrent(num2);
+            displayPrevious(num1);
         }
         else {
-            previousNum = currentNum;
-            currentNum = Number(button.textContent);
+            num1 = num2;
+            num2 = Number(button.textContent);
+            displayCurrent(num2);
+            displayPrevious(num1);
         }
-        console.log(previousNum);
-        console.log(currentNum);
+        console.log(num1);
+        console.log(num2);
     });
 });
 
 
 function add(){
-    return previousNum + currentNum;
+    return num1 + num2;
 }
 
 
 function subtract(){
-    return previousNum - currentNum;
+    return num1 - num2;
 }
 
 
 function multiply(){
-    return previousNum * currentNum;
+    return num1 * num2;
 }
 
 
 function divide(){
-    return previousNum / currentNum;
+    return num1 / num2;
 }
 
 
 function calculate(num1, num2, operator){
-    num1 = previousNum;
-    num2 = currentNum;
+    num1 = num1;
+    num2 = num2;
     operator = operatorBtn.textContent;
 
     switch (operator){
