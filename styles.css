@@ -59,5 +59,9 @@ body {
 }
 
 .clear {
-    width: 50%;
+    flex-basis: calc(50% - 5px);
+    aspect-ratio: auto;
+    border-radius: 30px;
+    padding-top: 25px;
+    padding-bottom: 25px; 
 }
