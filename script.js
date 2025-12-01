@@ -2,79 +2,98 @@ const numBtns = document.querySelectorAll(".num");
 const operatorBtns = document.querySelectorAll(".operator");
 const equalsBtn = document.querySelector(".equal");
 const clearBtn = document.querySelector(".clear");
-const currentDisplay = document.querySelector(".current-display");
-const previousDisplay = document.querySelector(".previous-display");
+const displayScreen = document.querySelector(".current-display");
 
-let num1;
-let num2;
-let operator;
+let firstOperand = '';
+let secondOperand = '';
+let operator = null;
+let waitingForSecondOperand = false;
+let justCalculated = false;
+
+function updateDisplay(value) {
+    displayScreen.textContent = value;
+}
 
 numBtns.forEach(button => {
     button.addEventListener("click", () => {
-        if(num1 === undefined && num2 === undefined) {
-            num1 = Number(button.textContent);
-            displayCurrent(num1);
+        if (justCalculated) {
+            firstOperand = '';
+            secondOperand = '';
+            operator = null;
+            waitingForSecondOperand = false;
+            updateDisplay('');
+            justCalculated = false;
         }
-        else if (num1 !== undefined && num2 === undefined) {
-            num2 = Number(button.textContent);
-            displayCurrent(num2);
-            displayPrevious(num1);
+        if (!waitingForSecondOperand) {
+            // Building first operand
+            if (button.textContent === "0" && firstOperand === '') return;
+            firstOperand += button.textContent; // start fresh after clear
+            updateDisplay(firstOperand);
+            waitingForSecondOperand = false;
+        } else {
+            // Building second operand
+            if (button.textContent === "0" && secondOperand === '') {
+                prompt("You can't divide by 0!");
+                return;
+            }
+            secondOperand += button.textContent;
+            updateDisplay(firstOperand + operator + secondOperand);
         }
-        else {
-            num1 = num2;
-            num2 = Number(button.textContent);
-            displayCurrent(num2);
-            displayPrevious(num1);
+    });
+});
+    if (justCalculated) {
+        firstOperand = '';
+        secondOperand = '';
+        operator = null;
+        waitingForSecondOperand = false;
+        updateDisplay('');
+        justCalculated = false;
+    }
+
+operatorBtns.forEach(button => {
+    button.addEventListener("click", () => {
+        if (firstOperand === '') return; // Don't allow operator before first number
+        if (operator && secondOperand !== '') {
+            // If already have two operands and operator, calculate first
+            firstOperand = String(operate(Number(firstOperand), Number(secondOperand), operator));
+            secondOperand = '';
+            updateDisplay(firstOperand);
         }
-        console.log(num1);
-        console.log(num2);
+        operator = button.textContent;
+        updateDisplay(firstOperand + operator);
+        waitingForSecondOperand = true;
     });
 });
 
+equalsBtn.addEventListener("click", () => {
+    if (firstOperand !== '' && operator && secondOperand !== '') {
+        const result = operate(Number(firstOperand), Number(secondOperand), operator);
+        updateDisplay(result);
+        firstOperand = String(result);
+        secondOperand = '';
+        operator = null;
+        waitingForSecondOperand = false;
+        justCalculated = true;
+    }
+});
 
-function add(){
-    return num1 + num2;
-}
+clearBtn.addEventListener("click", clearDisplay);
 
-
-function subtract(){
-    return num1 - num2;
-}
-
-
-function multiply(){
-    return num1 * num2;
-}
-
-
-function divide(){
-    return num1 / num2;
-}
-
-
-function calculate(num1, num2, operator){
-    num1 = num1;
-    num2 = num2;
-    operator = operatorBtn.textContent;
-
-    switch (operator){
-        case "+":
-            add();
-        case "-":
-            subtract();
-        case "*":
-            multiply();
-        case "/":
-            divide();
+function operate(num1, num2, op) {
+    switch (op) {
+        case '+': return num1 + num2;
+        case '-': return num1 - num2;
+        case '*': return num1 * num2;
+        case '/': return num2 !== 0 ? num1 / num2 : 'Error';
+        default: return num1;
     }
 }
 
-
-function displayCurrent(value) {
-    currentDisplay.textContent = value;
-}
-
-
-function displayPrevious(value) {
-    previousDisplay.textContent = value;
+function clearDisplay() {
+    displayScreen.textContent = '_';
+    firstOperand = '';
+    secondOperand = '';
+    operator = null;
+    waitingForSecondOperand = false;
+    justCalculated = false;
 }
